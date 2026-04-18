@@ -105,11 +105,14 @@ This makes the analysis usable for both technical and non‑technical stakeholde
 ---
 
 ## 📂 Repository Structure
-├── app.py               # Streamlit application
-├── notebooks/           # Kaggle development notebooks
-├── data/                # CSV datasets
-├── README.md
 
+├── app.py
+├── data/
+│   ├── unemployment.csv
+│   ├── richest_countries.csv
+│   ├── cost_of_living.csv
+│   ├── corruption.csv
+│   ├── tourism.csv
 ---
 
 ## 💼 Business Applications
