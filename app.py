@@ -73,18 +73,46 @@ df["market_cluster"] = kmeans.fit_predict(
     df[["opportunity_score", "tourism_dependency", "corruption_index"]]
 )
 
-# -----------------------------
-# Sidebar
-# -----------------------------
-st.sidebar.title("Controls")
-country = st.sidebar.selectbox("Select Country", sorted(df["country"].unique()))
+# --------------------------------------------------
+# Sidebar – Market Filters
+# --------------------------------------------------
+st.sidebar.title("Market Filters")
+
+selected_country = st.sidebar.selectbox(
+    "Primary country",
+    sorted(df["country"].unique())
+)
+
+st.sidebar.markdown("---")
+
+compare_countries = st.sidebar.multiselect(
+    "Compare with other countries",
+    options=sorted(df["country"].unique()),
+    default=[]
+)
 
 # -----------------------------
 # Main Dashboard
 # -----------------------------
 st.title("🌍 AI‑Powered Economic Intelligence Dashboard")
 
-selected = df[df["country"] == country].iloc[0]
+country_data = df[df["country"] == selected_country].iloc[0]
+
+comparison_df = None
+
+if compare_countries:
+    comparison_df = df[
+        df["country"].isin([selected_country] + compare_countries)
+    ][
+        [
+            "country",
+            "opportunity_score",
+            "unemployment_rate",
+            "corruption_index",
+            "gdp_per_capita",
+            "purchasing_power_index"
+        ]
+    ].set_index("country")
 
 col1, col2, col3 = st.columns(3)
 
