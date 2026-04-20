@@ -5,8 +5,9 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Status](https://img.shields.io/badge/Project-Active-success)
 
-## Dashboard Overview##<p align="center">
+## Dashboard Overview
 
+<p align="center">
   <img src="assets/dashboard_overview.png">
 </p>
 
