@@ -5,6 +5,15 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Status](https://img.shields.io/badge/Project-Active-success)
 
+## Dashboard Overview##<p align="center">
+  <img src="assets/dashboard_overview.png">
+</p>
+
+## Market Comparison & Ranking
+<p align="center">
+  <img src="assets/dashboard_comparison.png">
+</p>
+
 ### Data‑Driven Global Market Insights for Business Decision Making
 
 ## 📌 Overview
