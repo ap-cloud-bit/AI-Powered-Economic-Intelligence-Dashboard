@@ -145,6 +145,12 @@ AI-Powered-Economic-Intelligence-Dashboard/
 
 ---
 
+## 📄 License
+This project is licensed under the MIT License.  
+You are free to use, modify, and distribute this project with attribution.
+
+---
+
 ## 📬 Contact
 If you’d like a custom version of this dashboard or consulting support,
 feel free to reach out via LinkedIn or GitHub.
