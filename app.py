@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -40,8 +39,7 @@ def load_data():
            )
     )
 
-    df = df.fillna(df.median(numeric_only=True))
-    return df
+    return df.fillna(df.median(numeric_only=True))
 
 
 df = load_data()
@@ -56,7 +54,7 @@ df["tourism_dependency"] = df["percentage_of_gdp"]
 # ==================================================
 # Opportunity Score
 # ==================================================
-score_features = [
+features = [
     "gdp_per_capita",
     "purchasing_power_index",
     "receipts_in_billions",
@@ -65,8 +63,8 @@ score_features = [
 ]
 
 scaler = MinMaxScaler()
-scaled = scaler.fit_transform(df[score_features])
-scaled_df = pd.DataFrame(scaled, columns=score_features)
+scaled = scaler.fit_transform(df[features])
+scaled_df = pd.DataFrame(scaled, columns=features)
 
 df["opportunity_score"] = (
     scaled_df["gdp_per_capita"] * 0.30
@@ -85,9 +83,9 @@ df["market_cluster"] = kmeans.fit_predict(
 )
 
 # ==================================================
-# Insight Function (✅ MUST COME BEFORE USE)
+# Insight Functions
 # ==================================================
-def generate_insight(row):
+def generate_single_insight(row):
     if row.opportunity_score > 70 and row.corruption_index < 40:
         return "High‑opportunity, low‑risk market suitable for expansion."
     elif row.opportunity_score > 60:
@@ -97,8 +95,42 @@ def generate_insight(row):
     else:
         return "Balanced opportunity with mixed economic signals."
 
+
+def generate_comparative_insight(cdf):
+    ranked = cdf.sort_values("opportunity_score", ascending=False)
+    top = ranked.index[0]
+    bottom = ranked.index[-1]
+
+    insight = (
+        f"Among the selected countries, **{top}** demonstrates the highest overall "
+        f"opportunity score, reflecting stronger economic attractiveness. "
+        f"In contrast, **{bottom}** ranks lower, indicating comparatively higher "
+        f"economic or structural risk. "
+        "Overall, the selected countries present clear risk‑reward trade‑offs "
+        "rather than a single dominant choice."
+    )
+    return insight
+
+
+def generate_comparative_report(cdf):
+    report = "Comparative Economic Opportunity Report\n\n"
+    ranked = cdf.sort_values("opportunity_score", ascending=False)
+
+    for i, (country, row) in enumerate(ranked.iterrows(), 1):
+        report += (
+            f"{i}. {country}\n"
+            f"   Opportunity Score: {row.opportunity_score:.1f}\n"
+            f"   GDP per Capita: {row.gdp_per_capita:,.0f}\n"
+            f"   Unemployment Rate: {row.unemployment_rate:.1f}%\n"
+            f"   Corruption Index: {row.corruption_index:.0f}\n\n"
+        )
+
+    report += "Insight Summary:\n"
+    report += generate_comparative_insight(cdf)
+    return report
+
 # ==================================================
-# Sidebar – Filters & Screenshot Mode
+# Sidebar
 # ==================================================
 st.sidebar.title("Market Filters")
 
@@ -109,7 +141,7 @@ selected_country = st.sidebar.selectbox(
 
 compare_countries = st.sidebar.multiselect(
     "Compare with other countries",
-    options=sorted(df["country"].unique()),
+    options=sorted(df["country"].unique())
 )
 
 st.sidebar.markdown("---")
@@ -120,12 +152,12 @@ screenshot_mode = st.sidebar.checkbox("📸 Screenshot Mode", value=False)
 # ==================================================
 st.title("🌍 AI‑Powered Economic Intelligence Dashboard")
 st.caption(
-    "Decision‑support dashboard for market entry, "
-    "investment screening, and global business strategy."
+    "Data‑driven intelligence for market entry, investment screening, "
+    "and global business decisions."
 )
 
 # ==================================================
-# Primary Country Data
+# Primary Country
 # ==================================================
 country_data = df[df["country"] == selected_country].iloc[0]
 
@@ -134,11 +166,10 @@ country_data = df[df["country"] == selected_country].iloc[0]
 # ==================================================
 st.subheader("Key Indicators")
 
-col1, col2, col3 = st.columns(3)
-
-col1.metric("Opportunity Score (0–100)", f"{country_data.opportunity_score:.1f}")
-col2.metric("Unemployment Rate", f"{country_data.unemployment_rate:.1f}%")
-col3.metric("Corruption Index", int(country_data.corruption_index))
+c1, c2, c3 = st.columns(3)
+c1.metric("Opportunity Score (0–100)", f"{country_data.opportunity_score:.1f}")
+c2.metric("Unemployment Rate", f"{country_data.unemployment_rate:.1f}%")
+c3.metric("Corruption Index", int(country_data.corruption_index))
 
 st.markdown("---")
 
@@ -146,17 +177,22 @@ st.markdown("---")
 # Country Profile
 # ==================================================
 st.subheader("Country Economic Profile")
+profile = country_data[
+    ["gdp_per_capita", "cost_index", "purchasing_power_index", "tourism_dependency"]
+].to_frame("Value")
+st.dataframe(profile)
 
-profile_df = country_data[
-    [
-        "gdp_per_capita",
-        "cost_index",
-        "purchasing_power_index",
-        "tourism_dependency",
-    ]
-].to_frame(name="Value")
+st.markdown("---")
 
-st.dataframe(profile_df)
+# ==================================================
+# Top‑10 Opportunity Ranking ✅
+# ==================================================
+st.subheader("Top 10 Countries by Opportunity Score")
+
+top10 = df.sort_values("opportunity_score", ascending=False).head(10)[
+    ["country", "opportunity_score", "unemployment_rate", "corruption_index"]
+]
+st.dataframe(top10.set_index("country").style.format("{:.1f}"))
 
 st.markdown("---")
 
@@ -168,40 +204,38 @@ if compare_countries:
 
     comparison_df = df[
         df["country"].isin([selected_country] + compare_countries)
-    ][
-        [
-            "country",
-            "opportunity_score",
-            "unemployment_rate",
-            "corruption_index",
-            "gdp_per_capita",
-            "purchasing_power_index",
-        ]
     ].set_index("country")
 
     st.dataframe(
-        comparison_df.style.format(
-            {
-                "opportunity_score": "{:.1f}",
-                "unemployment_rate": "{:.1f}",
-                "corruption_index": "{:.0f}",
-                "gdp_per_capita": "{:,.0f}",
-                "purchasing_power_index": "{:.1f}",
-            }
-        )
+        comparison_df[
+            [
+                "opportunity_score",
+                "unemployment_rate",
+                "corruption_index",
+                "gdp_per_capita",
+                "purchasing_power_index",
+            ]
+        ].style.format("{:.1f}")
     )
 
     if not screenshot_mode:
         fig, ax = plt.subplots()
         comparison_df["opportunity_score"].plot(kind="bar", ax=ax)
         ax.set_ylabel("Opportunity Score")
-        ax.set_xlabel("")
         st.pyplot(fig)
+
+    # ✅ Downloadable comparative report
+    st.download_button(
+        "📄 Download Comparative Report",
+        generate_comparative_report(comparison_df),
+        file_name="comparative_economic_report.txt",
+        mime="text/plain"
+    )
 
     st.markdown("---")
 
 # ==================================================
-# Market Landscape (Hidden in Screenshot Mode)
+# Market Landscape
 # ==================================================
 if not screenshot_mode:
     st.subheader("Global Market Landscape")
@@ -212,49 +246,21 @@ if not screenshot_mode:
         x="corruption_index",
         y="opportunity_score",
         hue="market_cluster",
-        palette="Set2",
         ax=ax,
+        palette="Set2"
     )
     ax.set_xlabel("Corruption Index (Lower is Better)")
     ax.set_ylabel("Opportunity Score")
     st.pyplot(fig)
 
 # ==================================================
-# Automated Business Insight (✅ FIXED & ENHANCED)
+# Insights
 # ==================================================
-st.subheader("Automated Business Insight")
+st.subheader(
+    "Comparative Business Insight" if compare_countries else "Automated Business Insight"
+)
 
-col_a, col_b = st.columns([1, 3])
-
-with col_a:
-    st.metric(
-        "Opportunity Level",
-        "High" if country_data.opportunity_score >= 70
-        else "Medium" if country_data.opportunity_score >= 50
-        else "Low"
-    )
-
-with col_b:
-    st.info(generate_insight(country_data))
-
-st.markdown("**Key Drivers:**")
-
-drivers = []
-
-if country_data.gdp_per_capita > df["gdp_per_capita"].median():
-    drivers.append("Above‑average GDP per capita")
-
-if country_data.purchasing_power_index > df["purchasing_power_index"].median():
-    drivers.append("Strong purchasing power")
-
-if country_data.corruption_index > df["corruption_index"].median():
-    drivers.append("Elevated governance risk")
-
-if country_data.unemployment_rate > df["unemployment_rate"].median():
-    drivers.append("Labor market stress")
-
-if drivers:
-    for d in drivers:
-        st.write(f"• {d}")
+if compare_countries:
+    st.info(generate_comparative_insight(comparison_df))
 else:
-    st.write("• Balanced economic indicators with no extreme signals")
+    st.info(generate_single_insight(country_data))
