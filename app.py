@@ -8,7 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import KMeans
 
 # ==================================================
-# Page Configuration
+# Page Config
 # ==================================================
 st.set_page_config(
     page_title="AI‑Powered Economic Intelligence Dashboard",
@@ -85,7 +85,20 @@ df["market_cluster"] = kmeans.fit_predict(
 )
 
 # ==================================================
-# Sidebar – Market Filters
+# Insight Function (✅ MUST COME BEFORE USE)
+# ==================================================
+def generate_insight(row):
+    if row.opportunity_score > 70 and row.corruption_index < 40:
+        return "High‑opportunity, low‑risk market suitable for expansion."
+    elif row.opportunity_score > 60:
+        return "Attractive market with moderate risk — due diligence recommended."
+    elif row.tourism_dependency > 5:
+        return "Tourism‑dependent economy — vulnerable to external shocks."
+    else:
+        return "Balanced opportunity with mixed economic signals."
+
+# ==================================================
+# Sidebar – Filters & Screenshot Mode
 # ==================================================
 st.sidebar.title("Market Filters")
 
@@ -99,22 +112,25 @@ compare_countries = st.sidebar.multiselect(
     options=sorted(df["country"].unique()),
 )
 
+st.sidebar.markdown("---")
+screenshot_mode = st.sidebar.checkbox("📸 Screenshot Mode", value=False)
+
 # ==================================================
-# Main Header
+# Header
 # ==================================================
 st.title("🌍 AI‑Powered Economic Intelligence Dashboard")
 st.caption(
-    "Data‑driven economic intelligence for market entry, "
-    "investment screening, and global business decisions."
+    "Decision‑support dashboard for market entry, "
+    "investment screening, and global business strategy."
 )
 
 # ==================================================
-# Primary Country Selection
+# Primary Country Data
 # ==================================================
 country_data = df[df["country"] == selected_country].iloc[0]
 
 # ==================================================
-# KPI Section
+# KPIs
 # ==================================================
 st.subheader("Key Indicators")
 
@@ -175,42 +191,42 @@ if compare_countries:
         )
     )
 
-    fig, ax = plt.subplots()
-    comparison_df["opportunity_score"].plot(kind="bar", ax=ax)
-    ax.set_ylabel("Opportunity Score")
-    ax.set_xlabel("")
-    st.pyplot(fig)
+    if not screenshot_mode:
+        fig, ax = plt.subplots()
+        comparison_df["opportunity_score"].plot(kind="bar", ax=ax)
+        ax.set_ylabel("Opportunity Score")
+        ax.set_xlabel("")
+        st.pyplot(fig)
 
     st.markdown("---")
 
 # ==================================================
-# Market Landscape
+# Market Landscape (Hidden in Screenshot Mode)
 # ==================================================
-st.subheader("Global Market Landscape")
+if not screenshot_mode:
+    st.subheader("Global Market Landscape")
 
-fig, ax = plt.subplots(figsize=(8, 5))
-sns.scatterplot(
-    data=df,
-    x="corruption_index",
-    y="opportunity_score",
-    hue="market_cluster",
-    palette="Set2",
-    ax=ax,
-)
-ax.set_xlabel("Corruption Index (Lower is Better)")
-ax.set_ylabel("Opportunity Score")
-st.pyplot(fig)
+    fig, ax = plt.subplots(figsize=(8, 5))
+    sns.scatterplot(
+        data=df,
+        x="corruption_index",
+        y="opportunity_score",
+        hue="market_cluster",
+        palette="Set2",
+        ax=ax,
+    )
+    ax.set_xlabel("Corruption Index (Lower is Better)")
+    ax.set_ylabel("Opportunity Score")
+    st.pyplot(fig)
 
 # ==================================================
-# Insight Generator
+# Automated Business Insight (✅ FIXED & ENHANCED)
 # ==================================================
 st.subheader("Automated Business Insight")
 
-insight_text = generate_insight(country_data)
+col_a, col_b = st.columns([1, 3])
 
-col1, col2 = st.columns([1, 3])
-
-with col1:
+with col_a:
     st.metric(
         "Opportunity Level",
         "High" if country_data.opportunity_score >= 70
@@ -218,8 +234,8 @@ with col1:
         else "Low"
     )
 
-with col2:
-    st.info(insight_text)
+with col_b:
+    st.info(generate_insight(country_data))
 
 st.markdown("**Key Drivers:**")
 
