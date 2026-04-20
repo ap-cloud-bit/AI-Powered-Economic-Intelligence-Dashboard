@@ -1,4 +1,10 @@
 # 🌍 AI‑Powered Economic Intelligence Dashboard
+
+![Python](https://img.shields.io/badge/Python-3.9+-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Status](https://img.shields.io/badge/Project-Active-success)
+
 ### Data‑Driven Global Market Insights for Business Decision Making
 
 ## 📌 Overview
