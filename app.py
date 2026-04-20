@@ -206,9 +206,39 @@ st.pyplot(fig)
 # ==================================================
 st.subheader("Automated Business Insight")
 
+insight_text = generate_insight(country_data)
 
-def generate_insight(row):
-    if row.opportunity_score > 70 and row.corruption_index < 40:
-        return "High‑opportunity, low‑risk market suitable for expansion."
-    elif row.opportunity_score > 60:
-        return "Attractive market with moderate risk — due diligence recommended."
+col1, col2 = st.columns([1, 3])
+
+with col1:
+    st.metric(
+        "Opportunity Level",
+        "High" if country_data.opportunity_score >= 70
+        else "Medium" if country_data.opportunity_score >= 50
+        else "Low"
+    )
+
+with col2:
+    st.info(insight_text)
+
+st.markdown("**Key Drivers:**")
+
+drivers = []
+
+if country_data.gdp_per_capita > df["gdp_per_capita"].median():
+    drivers.append("Above‑average GDP per capita")
+
+if country_data.purchasing_power_index > df["purchasing_power_index"].median():
+    drivers.append("Strong purchasing power")
+
+if country_data.corruption_index > df["corruption_index"].median():
+    drivers.append("Elevated governance risk")
+
+if country_data.unemployment_rate > df["unemployment_rate"].median():
+    drivers.append("Labor market stress")
+
+if drivers:
+    for d in drivers:
+        st.write(f"• {d}")
+else:
+    st.write("• Balanced economic indicators with no extreme signals")
