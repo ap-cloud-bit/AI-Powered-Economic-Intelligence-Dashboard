@@ -104,6 +104,9 @@ This makes the analysis usable for both technical and non‑technical stakeholde
 
 ---
 
+## 📁 Repository Structure
+
+``` text
 AI-Powered-Economic-Intelligence-Dashboard/
 │
 ├── app.py                     # Streamlit application
@@ -125,6 +128,7 @@ AI-Powered-Economic-Intelligence-Dashboard/
 ├── requirements.txt
 └── .gitignore
 
+```
 ---
 
 ## 💼 Business Applications
