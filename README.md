@@ -106,7 +106,7 @@ This makes the analysis usable for both technical and non‑technical stakeholde
 ---
 
 ## 🌐 Live Demo
-*(Optional – add Streamlit link here)*
+👉 https://your-streamlit-link.streamlit.app
 
 ---
 
