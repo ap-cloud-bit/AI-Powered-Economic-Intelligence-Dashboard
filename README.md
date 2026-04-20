@@ -104,15 +104,27 @@ This makes the analysis usable for both technical and non‑technical stakeholde
 
 ---
 
-## 📂 Repository Structure
-
-├── app.py
+AI-Powered-Economic-Intelligence-Dashboard/
+│
+├── app.py                     # Streamlit application
+│
 ├── data/
 │   ├── unemployment.csv
 │   ├── richest_countries.csv
 │   ├── cost_of_living.csv
 │   ├── corruption.csv
-│   ├── tourism.csv
+│   └── tourism.csv
+│
+├── notebooks/
+│   └── economic_intelligence_dashboard.ipynb
+│
+├── assets/
+│   └── dashboard_screenshot.png
+│
+├── README.md
+├── requirements.txt
+└── .gitignore
+
 ---
 
 ## 💼 Business Applications
